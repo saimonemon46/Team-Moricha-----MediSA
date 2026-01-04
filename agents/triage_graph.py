@@ -5,6 +5,7 @@ from services.question_generator import generate_followup
 from agents.decision_agent import decide_next, doctor_decision
 from services.guidance_generator import generate_guidance
 from services.doctor_service import DoctorService
+from services.confidence_engine import ConfidenceEngine
 
 extractor = SymptomExtractor()
 severity_engine = SeverityEngine()
@@ -68,17 +69,29 @@ def should_continue(state):
     # Otherwise keep asking follow-ups
     return "followup"
 
+
+
+confidence_engine = ConfidenceEngine()
+
 def severity_node(state):
     score, level = severity_engine.calculate(state["collected_symptoms"])
     state["severity_score"] = score
     state["severity_level"] = level
+
+    state["confidence_score"] = confidence_engine.calculate(state)
     return state
+
 
 
 
 def low_severity_node(state):
     guidance = generate_guidance(state)
     print("\nAgent:", guidance)
+    
+    # ✅ PRINT CONFIDENCE HERE
+    if state.get("confidence_score") is not None:
+        print(f"\nTriage confidence score: {state['confidence_score']}")
+        print("(This reflects information completeness, not a medical diagnosis.)")
 
     choice = input(
         "\nAgent: Would you like to see a relevant doctor near you? (yes/no)\nYou: "
@@ -94,7 +107,12 @@ def emergency_node(state):
         "\nAgent: ⚠️ Your symptoms may indicate a serious condition.\n"
         "This could require immediate medical attention."
     )
-
+    # ✅ PRINT CONFIDENCE HERE
+    if state.get("confidence_score") is not None:
+        print(
+            f"\nTriage confidence score: {state['confidence_score']}"
+            "\n(This reflects how consistent the reported information was.)"
+        )
     choice = input(
         "Agent: Do you want to contact emergency services now? (yes/no)\nYou: "
     )
