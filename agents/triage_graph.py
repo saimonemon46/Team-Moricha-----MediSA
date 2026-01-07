@@ -75,25 +75,81 @@ def followup_node(state):
     # ------------------------------------------------------------------
     # ✅ Update info coverage (transparent, defensible heuristics)
     # ------------------------------------------------------------------
+    DURATION_KEYWORDS = [
+        # minutes / hours
+        "minute", "minutes", "min", "hour", "hours", "hr",
 
+        # general time references
+        "day", "days", "week", "weeks", "month", "months", "year", "years",
+
+        # relative timing
+        "ago", "since", "for", "started", "began",
+
+        # common phrases
+        "half an hour", "few hours", "couple of hours",
+        "this morning", "today", "yesterday", "last night"
+    ]
+    PROGRESSION_KEYWORDS = [
+        # change indicators
+        "change", "changed", "different",
+
+        # worsening / improvement
+        "worse", "worsening", "better", "improving",
+
+        # intensity / size
+        "increasing", "decreasing", "stronger", "weaker",
+        "bigger", "larger", "smaller", "spread", "spreading",
+
+        # appearance
+        "darker", "lighter", "color", "colour",
+        "redder", "swollen", "inflamed",
+
+        # stability
+        "same", "unchanged", "no change"
+    ]
+    SEVERITY_KEYWORDS = [
+        # qualitative
+        "mild", "moderate", "severe", "intense", "bad",
+
+        # numeric / scale
+        "scale", "out of", "/10", "rating", "rate",
+
+        # impact
+        "pain", "hurt", "hurting", "burning", "throbbing",
+        "unbearable", "tolerable"
+    ]
+    RED_FLAG_KEYWORDS = [
+        # breathing / circulation
+        "shortness of breath", "breathing problem", "difficulty breathing",
+        "chest pain", "tightness in chest",
+
+        # neurological
+        "faint", "fainted", "fainting", "unconscious",
+        "confusion", "seizure", "fits", "collapse",
+
+        # bleeding
+        "bleeding", "vomiting blood", "blood in vomit",
+
+        # swelling / allergic reactions
+        "swelling", "swollen lips", "swollen tongue",
+        "throat closing",
+
+        # severe systemic signs
+        "high fever", "very weak", "cannot stand"
+    ]
     text = user_input.lower()
 
-    if any(k in text for k in ["day", "week", "month", "year", "since", "for"]):
+    if any(k in text for k in DURATION_KEYWORDS):
         state["info_coverage"]["duration"] = True
 
-    if any(k in text for k in ["worse", "better", "increasing", "decreasing", "same"]):
+    if any(k in text for k in PROGRESSION_KEYWORDS):
         state["info_coverage"]["progression"] = True
 
-    if any(k in text for k in ["mild", "moderate", "severe", "pain", "scale"]):
+    if any(k in text for k in SEVERITY_KEYWORDS):
         state["info_coverage"]["severity"] = True
 
-    if any(k in text for k in [
-        "chest pain", "faint", "bleeding", "shortness of breath",
-        "unconscious", "seizure", "vomiting blood"
-    ]):
+    if any(k in text for k in RED_FLAG_KEYWORDS):
         state["info_coverage"]["red_flags"] = True
-
-    return state
 
 
 def should_continue(state):
@@ -119,23 +175,37 @@ def severity_node(state):
 
 
 def low_severity_node(state):
-    guidance = generate_guidance(state)
-    print("\nAgent:", guidance)
-
+    # --------------------------------------------------
+    # 1. Print triage summary FIRST
+    # --------------------------------------------------
     print("\nTriage summary:")
     for k, v in state["info_coverage"].items():
         print(f"- {k}: {'✓' if v else '✗'}")
 
+    # --------------------------------------------------
+    # 2. Print confidence score
+    # --------------------------------------------------
     if state.get("confidence_score") is not None:
         print(f"\nTriage confidence score: {state['confidence_score']}")
         print("(Reflects information completeness and internal consistency, not a diagnosis.)")
 
+    # --------------------------------------------------
+    # 3. THEN provide guidance
+    # --------------------------------------------------
+    guidance = generate_guidance(state)
+    print("\nAgent: Here is some general guidance based on what you shared:\n")
+    print(guidance)
+
+    # --------------------------------------------------
+    # 4. Doctor lookup option
+    # --------------------------------------------------
     choice = input(
         "\nAgent: Would you like to see a relevant doctor near you? (yes/no)\nYou: "
     )
 
     state["want_doctor"] = choice.lower().startswith("y")
     return state
+
 
 
 def emergency_node(state):
