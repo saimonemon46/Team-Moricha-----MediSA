@@ -7,27 +7,57 @@ from services.guidance_generator import generate_guidance
 from services.doctor_service import DoctorService
 from services.confidence_engine import ConfidenceEngine
 
+# ------------------------------------------------------------------
+# Setup
+# ------------------------------------------------------------------
+
 extractor = SymptomExtractor()
 severity_engine = SeverityEngine()
+confidence_engine = ConfidenceEngine()
+doctor_service = DoctorService()
 
 MAX_FOLLOWUPS = 6
 
+# ------------------------------------------------------------------
+# Nodes
+# ------------------------------------------------------------------
+
+def opening_node(state):
+    print("Agent: What symptom are you currently experiencing?")
+    user_input = input("You: ")
+
+    state["conversation_history"] = [user_input]
+    state["collected_symptoms"] = extractor.extract(user_input)
+    state["asked_questions"] = []
+
+    state["followup_count"] = 0
+    state["stop_flag"] = False
+
+    # ✅ Explicit information coverage
+    state["info_coverage"] = {
+        "duration": False,
+        "progression": False,
+        "severity": False,
+        "red_flags": False
+    }
+
+    return state
+
+
 def followup_node(state):
-    # increment follow-up count
     state["followup_count"] += 1
 
-    # hard cap to prevent infinite loops
+    # Safety cap
     if state["followup_count"] >= MAX_FOLLOWUPS:
         state["stop_flag"] = True
         return state
-    
+
     question = generate_followup(state)
 
     if question == "STOP":
         state["stop_flag"] = True
         return state
 
-    # Prevent duplicate questions
     if question in state["asked_questions"]:
         state["stop_flag"] = True
         return state
@@ -38,60 +68,67 @@ def followup_node(state):
 
     state["conversation_history"].append(user_input)
 
-    # extract symptoms but DO NOT use this to stop
+    # Extract symptoms
     new_symptoms = extractor.extract(user_input)
     state["collected_symptoms"].extend(new_symptoms)
 
-    state["stop_flag"] = False
-    return state
+    # ------------------------------------------------------------------
+    # ✅ Update info coverage (transparent, defensible heuristics)
+    # ------------------------------------------------------------------
 
+    text = user_input.lower()
 
-def opening_node(state):
-    print("Agent: What symptom are you currently experiencing?")
-    user_input = input("You: ")
+    if any(k in text for k in ["day", "week", "month", "year", "since", "for"]):
+        state["info_coverage"]["duration"] = True
 
-    state["conversation_history"].append(user_input)
-    state["collected_symptoms"] = extractor.extract(user_input)
+    if any(k in text for k in ["worse", "better", "increasing", "decreasing", "same"]):
+        state["info_coverage"]["progression"] = True
 
-    # Reset counters after symptom seed
-    state["followup_count"] = 0
-    state["last_symptom_count"] = len(state["collected_symptoms"])
-    state["stop_flag"] = False
+    if any(k in text for k in ["mild", "moderate", "severe", "pain", "scale"]):
+        state["info_coverage"]["severity"] = True
+
+    if any(k in text for k in [
+        "chest pain", "faint", "bleeding", "shortness of breath",
+        "unconscious", "seizure", "vomiting blood"
+    ]):
+        state["info_coverage"]["red_flags"] = True
 
     return state
 
 
 def should_continue(state):
-    # If LLM explicitly said STOP → go to severity decision
+    # Stop when coverage is complete
+    if all(state["info_coverage"].values()):
+        return "decide"
+
     if state.get("stop_flag"):
         return "decide"
 
-    # Otherwise keep asking follow-ups
     return "followup"
 
-
-
-confidence_engine = ConfidenceEngine()
 
 def severity_node(state):
     score, level = severity_engine.calculate(state["collected_symptoms"])
     state["severity_score"] = score
     state["severity_level"] = level
 
+    # Confidence now has real meaning
     state["confidence_score"] = confidence_engine.calculate(state)
+
     return state
-
-
 
 
 def low_severity_node(state):
     guidance = generate_guidance(state)
     print("\nAgent:", guidance)
-    
-    # ✅ PRINT CONFIDENCE HERE
+
+    print("\nTriage summary:")
+    for k, v in state["info_coverage"].items():
+        print(f"- {k}: {'✓' if v else '✗'}")
+
     if state.get("confidence_score") is not None:
         print(f"\nTriage confidence score: {state['confidence_score']}")
-        print("(This reflects information completeness, not a medical diagnosis.)")
+        print("(Reflects information completeness and internal consistency, not a diagnosis.)")
 
     choice = input(
         "\nAgent: Would you like to see a relevant doctor near you? (yes/no)\nYou: "
@@ -101,27 +138,30 @@ def low_severity_node(state):
     return state
 
 
-
 def emergency_node(state):
     print(
         "\nAgent: ⚠️ Your symptoms may indicate a serious condition.\n"
         "This could require immediate medical attention."
     )
-    # ✅ PRINT CONFIDENCE HERE
+
+    print("\nTriage summary:")
+    for k, v in state["info_coverage"].items():
+        print(f"- {k}: {'✓' if v else '✗'}")
+
     if state.get("confidence_score") is not None:
         print(
-            f"\nTriage confidence score: {state['confidence_score']}"
-            "\n(This reflects how consistent the reported information was.)"
+            f"\nTriage confidence score: {state['confidence_score']}\n"
+            "(Reflects consistency and coverage.)"
         )
+
     choice = input(
         "Agent: Do you want to contact emergency services now? (yes/no)\nYou: "
     )
 
     if choice.lower().startswith("y"):
         print("\nAgent: Emergency number (Bangladesh): 999")
-        print("Please seek immediate medical help.")
     else:
-        print("\nAgent: Understood. Please seek medical care as soon as possible.")
+        print("\nAgent: Please seek medical care as soon as possible.")
 
     return state
 
@@ -132,11 +172,6 @@ def ask_location_node(state):
     return state
 
 
-
-
-
-doctor_service = DoctorService()
-
 def doctor_lookup_node(state):
     location = state.get("user_location", "")
     results = doctor_service.find(location, limit=3)
@@ -145,7 +180,7 @@ def doctor_lookup_node(state):
         print("\nAgent: No doctors were found for the provided location.")
         return state
 
-    print("\nAgent: Here are a few doctors near you you may consider:\n")
+    print("\nAgent: Doctors you may consider:\n")
 
     for _, row in results.iterrows():
         print(f"- Doctor Name: {row['Doctor Name']}")
@@ -155,8 +190,13 @@ def doctor_lookup_node(state):
 
     return state
 
+
 def end_node(state):
     return state
+
+# ------------------------------------------------------------------
+# Graph
+# ------------------------------------------------------------------
 
 graph = StateGraph(dict)
 
@@ -169,15 +209,19 @@ graph.add_node("ask_location", ask_location_node)
 graph.add_node("doctor_lookup", doctor_lookup_node)
 graph.add_node("end", end_node)
 
-
 graph.set_entry_point("opening")
 
-
-# After followup, ALWAYS go to severity
 graph.add_edge("opening", "followup")
-graph.add_edge("followup", "severity")
 
-# After severity, either loop or end
+graph.add_conditional_edges(
+    "followup",
+    should_continue,
+    {
+        "followup": "followup",
+        "decide": "severity"
+    }
+)
+
 graph.add_conditional_edges(
     "severity",
     decide_next,
@@ -196,9 +240,9 @@ graph.add_conditional_edges(
         "end": "end"
     }
 )
+
 graph.add_edge("ask_location", "doctor_lookup")
 graph.add_edge("doctor_lookup", "end")
-
 graph.add_edge("emergency", "end")
 
 app = graph.compile()
