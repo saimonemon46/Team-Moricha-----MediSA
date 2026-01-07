@@ -7,6 +7,8 @@ from services.guidance_generator import generate_guidance
 from services.doctor_service import DoctorService
 from services.confidence_engine import ConfidenceEngine
 from utils.triage_reasoning import generate_triage_reasoning
+from utils.confidence_bucket import confidence_bucket
+
 
 
 # ------------------------------------------------------------------
@@ -196,9 +198,14 @@ def low_severity_node(state):
     # --------------------------------------------------
     # 3. Confidence score
     # --------------------------------------------------
+    # CONFIDENCE SCORE (with bucket)
     if state.get("confidence_score") is not None:
-        print(f"\nTriage confidence score: {state['confidence_score']}")
+        score = state["confidence_score"]
+        bucket = confidence_bucket(score)
+
+        print(f"\nTriage confidence: {bucket} ({score})")
         print("(Reflects information completeness and internal consistency, not a diagnosis.)")
+
 
     # --------------------------------------------------
     # 4. Guidance (optional, non-diagnostic)
@@ -241,11 +248,16 @@ def emergency_node(state):
     # --------------------------------------------------
     # 4. CONFIDENCE SCORE
     # --------------------------------------------------
+    # CONFIDENCE SCORE (with bucket)
     if state.get("confidence_score") is not None:
+        score = state["confidence_score"]
+        bucket = confidence_bucket(score)
+
         print(
-            f"\nTriage confidence score: {state['confidence_score']}\n"
+            f"\nTriage confidence: {bucket} ({score})\n"
             "(Reflects information completeness and internal consistency, not a diagnosis.)"
         )
+
 
     # --------------------------------------------------
     # 5. USER ACTION
