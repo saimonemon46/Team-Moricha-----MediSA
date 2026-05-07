@@ -1,0 +1,32 @@
+# MediAI — FastAPI AI Service Dependencies
+# Install with: pip install -r requirements.txt
+
+# Web framework
+fastapi
+uvicorn
+
+# LLM
+groq
+
+# AI orchestration
+langgraph
+langchain-core
+
+# RAG / Embeddings
+sentence-transformers
+faiss-cpu
+
+# OCR & Document processing
+pytesseract
+Pillow
+pdfplumber
+
+# Data
+numpy
+pandas
+
+# Utilities
+python-multipart
+python-dotenv
+pydantic
+httpx
