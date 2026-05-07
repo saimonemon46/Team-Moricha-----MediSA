@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Medications — MediAI</title>
+<link rel="stylesheet" href="../css/main.css">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,300;0,400;0,600;1,300&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+<div class="dashboard-layout">
+  <aside class="sidebar">
+    <div class="sidebar-brand">Medi<span>AI</span></div>
+    <nav class="sidebar-nav">
+      <a href="dashboard.html"><span class="nav-icon">◈</span> Dashboard</a>
+      <a href="symptom-chat.html"><span class="nav-icon">◎</span> Symptom Check</a>
+      <a href="reports.html"><span class="nav-icon">◉</span> My Reports</a>
+      <a href="documents.html"><span class="nav-icon">⬡</span> Documents</a>
+      <a href="medications.html" class="active"><span class="nav-icon">◇</span> Medications</a>
+      <a href="doctors.html"><span class="nav-icon">⊕</span> Find Doctors</a>
+      <a href="appointments.html"><span class="nav-icon">▷</span> Appointments</a>
+    </nav>
+    <div class="sidebar-user">
+      <strong id="sidebarUserName">–</strong>
+      <a href="#" onclick="logout()">Sign out</a>
+    </div>
+  </aside>
+  <main class="main-content">
+    <div class="page-header">
+      <h1>Medication Reminders</h1>
+      <p>AI-extracted from your uploaded prescriptions</p>
+    </div>
+    <div class="alert alert-info mb-24">◎ <span>Upload a prescription on the <a href="documents.html" class="text-teal">Documents</a> page to automatically extract medication reminders.</span></div>
+    <div class="card">
+      <div class="card-title">Active Medications</div>
+      <div id="medList"><p class="text-muted">No medications scheduled yet.</p></div>
+    </div>
+    <div class="card mt-24">
+      <div class="card-title">Add Medication Manually</div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;align-items:end">
+        <div class="form-group" style="margin:0">
+          <label>Medicine name</label>
+          <input type="text" id="medName" placeholder="e.g. Paracetamol">
+        </div>
+        <div class="form-group" style="margin:0">
+          <label>Dosage</label>
+          <input type="text" id="medDose" placeholder="e.g. 500mg">
+        </div>
+        <div class="form-group" style="margin:0">
+          <label>Frequency</label>
+          <select id="medFreq">
+            <option value="once_daily">Once daily</option>
+            <option value="twice_daily">Twice daily</option>
+            <option value="three_times">Three times daily</option>
+            <option value="four_times">Four times daily</option>
+            <option value="every_8h">Every 8 hours</option>
+            <option value="every_6h">Every 6 hours</option>
+            <option value="as_needed">As needed</option>
+            <option value="weekly">Weekly</option>
+          </select>
+        </div>
+        <div class="form-group" style="margin:0">
+          <label>Start date</label>
+          <input type="date" id="medStart">
+        </div>
+        <div class="form-group" style="margin:0">
+          <label>End date</label>
+          <input type="date" id="medEnd">
+        </div>
+        <div class="form-group" style="margin:0;grid-column:1/-1">
+          <label>Instructions</label>
+          <textarea id="medInstructions" placeholder="e.g. Take after meals" style="min-height:70px"></textarea>
+        </div>
+        <button class="btn-primary" onclick="addMedication()" style="padding:12px 20px;height:fit-content;border:none;cursor:pointer">Add</button>
+      </div>
+    </div>
+  </main>
+</div>
+<script src="../js/medications.js"></script>
+</body>
+</html>

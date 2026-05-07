@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Appointments — MediAI</title>
+<link rel="stylesheet" href="../css/main.css">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,300;0,400;0,600;1,300&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+<div class="dashboard-layout">
+  <aside class="sidebar">
+    <div class="sidebar-brand">Medi<span>AI</span></div>
+    <nav class="sidebar-nav">
+      <a href="dashboard.html"><span class="nav-icon">◈</span> Dashboard</a>
+      <a href="symptom-chat.html"><span class="nav-icon">◎</span> Symptom Check</a>
+      <a href="reports.html"><span class="nav-icon">◉</span> My Reports</a>
+      <a href="documents.html"><span class="nav-icon">⬡</span> Documents</a>
+      <a href="medications.html"><span class="nav-icon">◇</span> Medications</a>
+      <a href="doctors.html"><span class="nav-icon">⊕</span> Find Doctors</a>
+      <a href="appointments.html" class="active"><span class="nav-icon">▷</span> Appointments</a>
+    </nav>
+    <div class="sidebar-user">
+      <strong id="sidebarUserName">–</strong>
+      <a href="#" onclick="logout()">Sign out</a>
+    </div>
+  </aside>
+  <main class="main-content">
+    <div class="page-header">
+      <h1>Appointments</h1>
+      <p>Manage your doctor appointments</p>
+    </div>
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-title">Upcoming</div>
+        <div id="upcomingList"><p class="text-muted">No upcoming appointments.</p></div>
+      </div>
+      <div class="card">
+        <div class="card-title">Past Appointments</div>
+        <div id="pastList"><p class="text-muted">No past appointments.</p></div>
+      </div>
+    </div>
+  </main>
+</div>
+<script src="../js/appointments.js"></script>
+</body>
+</html>

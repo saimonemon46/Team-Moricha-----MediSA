@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Find Doctors — MediAI</title>
+<link rel="stylesheet" href="../css/main.css">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,300;0,400;0,600;1,300&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+<div class="dashboard-layout">
+  <aside class="sidebar">
+    <div class="sidebar-brand">Medi<span>AI</span></div>
+    <nav class="sidebar-nav">
+      <a href="dashboard.html"><span class="nav-icon">◈</span> Dashboard</a>
+      <a href="symptom-chat.html"><span class="nav-icon">◎</span> Symptom Check</a>
+      <a href="reports.html"><span class="nav-icon">◉</span> My Reports</a>
+      <a href="documents.html"><span class="nav-icon">⬡</span> Documents</a>
+      <a href="medications.html"><span class="nav-icon">◇</span> Medications</a>
+      <a href="doctors.html" class="active"><span class="nav-icon">⊕</span> Find Doctors</a>
+      <a href="appointments.html"><span class="nav-icon">▷</span> Appointments</a>
+    </nav>
+    <div class="sidebar-user">
+      <strong id="sidebarUserName">–</strong>
+      <a href="#" onclick="logout()">Sign out</a>
+    </div>
+  </aside>
+
+  <main class="main-content">
+    <div class="page-header">
+      <h1>Find Doctors</h1>
+      <p>AI-matched specialists based on your condition and location</p>
+    </div>
+
+    <div class="card mb-24">
+      <div id="assessmentContextBanner" class="alert alert-info" style="display:none"></div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px">
+        <input type="text" id="searchSpec" placeholder="Specialization (e.g. Cardiologist)" class="form-group" style="padding:12px 16px;border:1.5px solid var(--border);border-radius:var(--radius);font-family:var(--font-body);font-size:14px;background:var(--cream);outline:none" onfocus="this.style.borderColor='var(--teal)'" onblur="this.style.borderColor='var(--border)'">
+        <input type="text" id="searchLocation" placeholder="Location (e.g. Dhaka)" class="form-group" style="padding:12px 16px;border:1.5px solid var(--border);border-radius:var(--radius);font-family:var(--font-body);font-size:14px;background:var(--cream);outline:none" onfocus="this.style.borderColor='var(--teal)'" onblur="this.style.borderColor='var(--border)'">
+        <input type="text" id="searchContext" placeholder="Symptoms or report context" class="form-group" style="padding:12px 16px;border:1.5px solid var(--border);border-radius:var(--radius);font-family:var(--font-body);font-size:14px;background:var(--cream);outline:none" onfocus="this.style.borderColor='var(--teal)'" onblur="this.style.borderColor='var(--border)'">
+        <button class="btn-primary" onclick="searchDoctors()" style="padding:12px 24px;white-space:nowrap;border:none;cursor:pointer">Search</button>
+      </div>
+      <div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap">
+        <button class="badge badge-low" onclick="filterSpec('Medicine Specialist')" style="cursor:pointer;border:none">Medicine Specialist</button>
+        <button class="badge badge-low" onclick="filterSpec('Cardiologist')" style="cursor:pointer;border:none">Cardiologist</button>
+        <button class="badge badge-low" onclick="filterSpec('Neurologist')" style="cursor:pointer;border:none">Neurologist</button>
+        <button class="badge badge-low" onclick="filterSpec('Pediatrician')" style="cursor:pointer;border:none">Pediatrician</button>
+        <button class="badge badge-low" onclick="filterSpec('Dermatologist')" style="cursor:pointer;border:none">Dermatologist</button>
+      </div>
+      <div id="doctorResultMeta" class="text-muted" style="margin-top:12px"></div>
+    </div>
+
+    <div class="doctor-grid" id="doctorGrid">
+      <!-- Populated by JS -->
+    </div>
+
+    <div id="doctorEmpty" class="card" style="display:none">
+      <p class="text-muted" style="text-align:center;padding:40px 0">No doctors found. Try a different search.</p>
+    </div>
+  </main>
+</div>
+
+<!-- Book Appointment Modal -->
+<div id="bookModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.4);z-index:300;align-items:center;justify-content:center;padding:20px">
+  <div class="card" style="width:100%;max-width:440px">
+    <div class="card-title" id="bookDoctorName">Book Appointment</div>
+    <div id="bookingDoctorSummary" class="alert alert-info" style="display:none;padding:10px 12px;margin-bottom:14px"></div>
+    <div class="form-group">
+      <label>Visit type</label>
+      <select id="visitType" style="width:100%;padding:12px;border:1.5px solid var(--border);border-radius:var(--radius);font-family:var(--font-body);font-size:15px;background:var(--cream);outline:none">
+        <option>In-person consultation</option>
+        <option>Follow-up review</option>
+        <option>Video consultation</option>
+        <option>Phone consultation</option>
+        <option>Urgent review</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>Date</label>
+      <input type="date" id="apptDate" style="width:100%;padding:12px;border:1.5px solid var(--border);border-radius:var(--radius);font-family:var(--font-body);font-size:15px;background:var(--cream);outline:none">
+    </div>
+    <div class="form-group">
+      <label>Time</label>
+      <input type="time" id="apptTime" value="09:00" style="width:100%;padding:12px;border:1.5px solid var(--border);border-radius:var(--radius);font-family:var(--font-body);font-size:15px;background:var(--cream);outline:none">
+    </div>
+    <div class="form-group">
+      <label>Contact preference</label>
+      <select id="contactPreference" style="width:100%;padding:12px;border:1.5px solid var(--border);border-radius:var(--radius);font-family:var(--font-body);font-size:15px;background:var(--cream);outline:none">
+        <option>Call me</option>
+        <option>SMS or WhatsApp</option>
+        <option>Email</option>
+        <option>No preference</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>Notes (optional)</label>
+      <textarea id="apptNotes" placeholder="Reason for visit..." style="width:100%;padding:12px;border:1.5px solid var(--border);border-radius:var(--radius);font-family:var(--font-body);font-size:15px;background:var(--cream);outline:none;resize:vertical;min-height:80px"></textarea>
+    </div>
+    <div style="display:flex;gap:12px">
+      <button class="btn-submit" onclick="confirmBooking()" style="flex:1">Confirm Booking</button>
+      <button class="btn-ghost" onclick="closeBookModal()" style="flex:1;padding:14px;font-size:15px">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<script src="../js/doctors.js"></script>
+</body>
+</html>

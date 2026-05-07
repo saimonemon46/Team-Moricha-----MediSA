@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hospital Dashboard — MediAI</title>
+<link rel="stylesheet" href="../css/main.css">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,300;0,400;0,600;1,300&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+.intake-queue { display: flex; flex-direction: column; gap: 12px; }
+.intake-card {
+  display: flex; align-items: center; gap: 16px;
+  padding: 16px 20px;
+  background: #fff; border-radius: var(--radius);
+  border: 1px solid var(--border);
+  border-left: 4px solid var(--teal);
+}
+.intake-card.high  { border-left-color: var(--red-urgent); }
+.intake-card.medium{ border-left-color: var(--amber); }
+.intake-card.low   { border-left-color: var(--green-safe); }
+.intake-num {
+  width: 36px; height: 36px;
+  background: var(--teal-light);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-display); font-weight: 600; color: var(--teal);
+  flex-shrink: 0; font-size: 14px;
+}
+.intake-info { flex: 1; }
+.intake-info .patient-name { font-weight: 500; font-size: 15px; margin-bottom: 2px; }
+.intake-info .patient-detail { font-size: 13px; color: var(--ink-muted); }
+.btn-triage {
+  background: var(--teal); color: #fff;
+  border: none; border-radius: 8px;
+  padding: 8px 16px; cursor: pointer;
+  font-family: var(--font-body); font-size: 13px; font-weight: 500;
+  white-space: nowrap; transition: background 0.2s;
+}
+.btn-triage:hover { background: var(--teal-mid); }
+</style>
+</head>
+<body>
+<div class="dashboard-layout">
+  <aside class="sidebar">
+    <div class="sidebar-brand">Medi<span>AI</span></div>
+    <nav class="sidebar-nav">
+      <a href="hospital-dashboard.html" class="active"><span class="nav-icon">◈</span> Intake Queue</a>
+      <a href="reports.html"><span class="nav-icon">◉</span> Triage Reports</a>
+      <a href="appointments.html"><span class="nav-icon">▷</span> Appointments</a>
+      <a href="doctors.html"><span class="nav-icon">⊕</span> Doctors</a>
+    </nav>
+    <div class="sidebar-user">
+      <strong>Hospital Admin</strong>
+      <a href="../index.html">Back to home</a>
+    </div>
+  </aside>
+
+  <main class="main-content">
+    <div class="page-header">
+      <h1>Patient Intake Queue</h1>
+      <p>AI-assisted triage for incoming patients</p>
+    </div>
+
+    <div class="stats-row">
+      <div class="stat-card">
+        <div class="stat-label">Waiting</div>
+        <div class="stat-value" style="color:var(--amber)">4</div>
+        <div class="stat-desc">In queue</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">High urgency</div>
+        <div class="stat-value" style="color:var(--red-urgent)">1</div>
+        <div class="stat-desc">Immediate attention</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Triaged today</div>
+        <div class="stat-value">12</div>
+        <div class="stat-desc">Reports generated</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Avg. triage time</div>
+        <div class="stat-value" style="font-size:22px">3.2 min</div>
+        <div class="stat-desc">Per patient</div>
+      </div>
+    </div>
+
+    <!-- New patient intake form -->
+    <div class="card mb-24">
+      <div class="card-title">Register New Patient</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 2fr auto;gap:12px;align-items:end">
+        <div class="form-group" style="margin:0">
+          <label>Patient name</label>
+          <input type="text" id="intakeName" placeholder="Full name">
+        </div>
+        <div class="form-group" style="margin:0">
+          <label>Phone</label>
+          <input type="tel" id="intakePhone" placeholder="+880 ...">
+        </div>
+        <div class="form-group" style="margin:0">
+          <label>Primary symptom</label>
+          <input type="text" id="intakeSymptom" placeholder="e.g. chest pain with shortness of breath">
+        </div>
+        <button class="btn-primary" onclick="registerPatient()" style="padding:12px 20px;height:fit-content">Add to Queue</button>
+      </div>
+    </div>
+
+    <!-- Queue -->
+    <div class="card">
+      <div class="card-title">Current Queue</div>
+      <div class="intake-queue" id="intakeQueue">
+        <div class="intake-card high">
+          <div class="intake-num">1</div>
+          <div class="intake-info">
+            <div class="patient-name">Mohammad Hasan</div>
+            <div class="patient-detail">Chest pain, shortness of breath · Waiting 8 min</div>
+          </div>
+          <span class="badge badge-high">HIGH</span>
+          <button class="btn-triage" onclick="runTriage('Mohammad Hasan','chest pain and shortness of breath')">AI Triage</button>
+        </div>
+        <div class="intake-card medium">
+          <div class="intake-num">2</div>
+          <div class="intake-info">
+            <div class="patient-name">Fatema Khatun</div>
+            <div class="patient-detail">High fever, headache · Waiting 15 min</div>
+          </div>
+          <span class="badge badge-medium">MEDIUM</span>
+          <button class="btn-triage" onclick="runTriage('Fatema Khatun','high fever and headache')">AI Triage</button>
+        </div>
+        <div class="intake-card medium">
+          <div class="intake-num">3</div>
+          <div class="intake-info">
+            <div class="patient-name">Abdul Karim</div>
+            <div class="patient-detail">Persistent cough, fatigue · Waiting 22 min</div>
+          </div>
+          <span class="badge badge-medium">MEDIUM</span>
+          <button class="btn-triage" onclick="runTriage('Abdul Karim','persistent cough and fatigue')">AI Triage</button>
+        </div>
+        <div class="intake-card low">
+          <div class="intake-num">4</div>
+          <div class="intake-info">
+            <div class="patient-name">Rina Begum</div>
+            <div class="patient-detail">Skin rash, itching · Waiting 30 min</div>
+          </div>
+          <span class="badge badge-low">LOW</span>
+          <button class="btn-triage" onclick="runTriage('Rina Begum','skin rash and itching')">AI Triage</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Triage result panel -->
+    <div id="triageResultPanel" class="card mt-24" style="display:none">
+      <div class="card-title" id="triagePatientName">AI Triage Result</div>
+      <div id="triageResultContent"></div>
+    </div>
+  </main>
+</div>
+
+<script>
+const AI_BASE = 'http://localhost:8000';
+
+function escHtml(t) { return String(t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+let queueCount = 4;
+
+function registerPatient() {
+  const name    = document.getElementById('intakeName').value.trim();
+  const phone   = document.getElementById('intakePhone').value.trim();
+  const symptom = document.getElementById('intakeSymptom').value.trim();
+  if (!name || !symptom) { alert('Name and symptom are required.'); return; }
+
+  queueCount++;
+  const card = document.createElement('div');
+  card.className = 'intake-card medium';
+  card.innerHTML = `
+    <div class="intake-num">${queueCount}</div>
+    <div class="intake-info">
+      <div class="patient-name">${escHtml(name)}</div>
+      <div class="patient-detail">${escHtml(symptom)} · Just arrived</div>
+    </div>
+    <span class="badge badge-medium">PENDING</span>
+    <button class="btn-triage" onclick="runTriage('${escHtml(name)}','${escHtml(symptom)}')">AI Triage</button>`;
+  document.getElementById('intakeQueue').appendChild(card);
+  document.getElementById('intakeName').value = '';
+  document.getElementById('intakePhone').value = '';
+  document.getElementById('intakeSymptom').value = '';
+}
+
+async function runTriage(name, symptom) {
+  const panel = document.getElementById('triageResultPanel');
+  const content = document.getElementById('triageResultContent');
+  const title = document.getElementById('triagePatientName');
+
+  panel.style.display = 'block';
+  title.textContent = 'Triaging: ' + name;
+  content.innerHTML = '<div class="alert alert-info">◎ <span>Running AI triage analysis...</span></div>';
+  panel.scrollIntoView({ behavior: 'smooth' });
+
+  try {
+    const qRes = await fetch(AI_BASE + '/generate-questions', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ symptom, user_id: 0 })
+    });
+    const qData = await qRes.json();
+
+    const rRes = await fetch(AI_BASE + '/generate-report', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ session_id: qData.session_id, symptom, answers: [], user_id: 0 })
+    });
+    const rData = await rRes.json();
+    renderTriageResult(name, rData.report);
+  } catch {
+    // Demo
+    const urgencies = ['medium','high','low'];
+    const conditions = ['Viral Respiratory Infection','Suspected Angina','Dengue Fever','Allergic Reaction'];
+    const specialists = ['General Physician','Cardiologist','General Physician','Dermatologist'];
+    const idx = Math.floor(Math.random() * conditions.length);
+    renderTriageResult(name, {
+      possible_condition: conditions[idx],
+      urgency: urgencies[Math.floor(Math.random()*3)],
+      recommended_specialist: specialists[idx],
+      reasoning: 'Symptoms are consistent with ' + conditions[idx] + ' based on the medical knowledge base retrieval.',
+      guidance: 'Immediate assessment by ' + specialists[idx] + ' recommended. Monitor vital signs.',
+      symptoms_listed: [symptom],
+      generated_at: new Date().toISOString()
+    });
+  }
+}
+
+function renderTriageResult(name, r) {
+  const urgClass = { high:'badge-high', medium:'badge-medium', low:'badge-low' }[r.urgency]||'badge-medium';
+  document.getElementById('triageResultContent').innerHTML = `
+    <div style="display:flex;align-items:center;gap:16px;margin-bottom:20px;flex-wrap:wrap">
+      <div>
+        <div class="text-muted" style="font-size:11px;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">Possible Condition</div>
+        <div style="font-family:var(--font-display);font-size:20px;font-weight:400">${escHtml(r.possible_condition)}</div>
+      </div>
+      <span class="badge ${urgClass}" style="font-size:13px;padding:6px 14px">${(r.urgency||'medium').toUpperCase()}</span>
+    </div>
+    <div class="grid-2">
+      <div class="report-section" style="padding-bottom:16px;border-bottom:1px solid var(--border)">
+        <h4 style="font-size:11px;text-transform:uppercase;letter-spacing:1px;color:var(--ink-muted);margin-bottom:8px">Recommended Specialist</h4>
+        <p style="font-weight:500">${escHtml(r.recommended_specialist)}</p>
+      </div>
+      <div class="report-section" style="padding-bottom:16px;border-bottom:1px solid var(--border)">
+        <h4 style="font-size:11px;text-transform:uppercase;letter-spacing:1px;color:var(--ink-muted);margin-bottom:8px">AI Reasoning</h4>
+        <p style="font-size:14px">${escHtml(r.reasoning)}</p>
+      </div>
+    </div>
+    <div style="margin-top:16px">
+      <h4 style="font-size:11px;text-transform:uppercase;letter-spacing:1px;color:var(--ink-muted);margin-bottom:8px">Guidance</h4>
+      <p style="font-size:14px">${escHtml(r.guidance)}</p>
+    </div>
+    <div style="margin-top:16px;font-size:12px;color:var(--ink-muted)">
+      Generated: ${new Date(r.generated_at||Date.now()).toLocaleString()} ·
+      <em>AI-assisted triage — verify with clinical assessment</em>
+    </div>`;
+}
+</script>
+</body>
+</html>

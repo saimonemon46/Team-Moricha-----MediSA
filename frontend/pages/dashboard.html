@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard — MediAI</title>
+<link rel="stylesheet" href="../css/main.css">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,300;0,400;0,600;1,300&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+<div class="dashboard-layout">
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-brand">Medi<span>AI</span></div>
+    <nav class="sidebar-nav">
+      <a href="dashboard.html" class="active"><span class="nav-icon">◈</span> Dashboard</a>
+      <a href="symptom-chat.html"><span class="nav-icon">◎</span> Symptom Check</a>
+      <a href="reports.html"><span class="nav-icon">◉</span> My Reports</a>
+      <a href="documents.html"><span class="nav-icon">⬡</span> Documents</a>
+      <a href="medications.html"><span class="nav-icon">◇</span> Medications</a>
+      <a href="doctors.html"><span class="nav-icon">⊕</span> Find Doctors</a>
+      <a href="appointments.html"><span class="nav-icon">▷</span> Appointments</a>
+    </nav>
+    <div class="sidebar-user">
+      <strong id="sidebarUserName">Loading...</strong>
+      <a href="#" onclick="logout()">Sign out</a>
+    </div>
+  </aside>
+
+  <!-- Main -->
+  <main class="main-content">
+    <div class="page-header">
+      <h1>Good morning, <span id="greetName">–</span></h1>
+      <p>Here's your health summary</p>
+    </div>
+
+    <div class="stats-row">
+      <div class="stat-card">
+        <div class="stat-label">Triage Sessions</div>
+        <div class="stat-value" id="statSessions">–</div>
+        <div class="stat-desc">Total assessments</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Reports</div>
+        <div class="stat-value" id="statReports">–</div>
+        <div class="stat-desc">Generated this month</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Medications</div>
+        <div class="stat-value" id="statMeds">–</div>
+        <div class="stat-desc">Active reminders</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Appointments</div>
+        <div class="stat-value" id="statAppts">–</div>
+        <div class="stat-desc">Upcoming</div>
+      </div>
+    </div>
+
+    <div class="alert alert-info mb-24">
+      ◎ <span>Start a new symptom check to receive an AI triage report backed by medical knowledge.</span>
+    </div>
+
+    <div class="grid-2">
+      <!-- Recent Reports -->
+      <div class="card">
+        <div class="card-title">Recent Triage Reports</div>
+        <div id="recentReports">
+          <table class="data-table">
+            <thead><tr><th>Date</th><th>Condition</th><th>Urgency</th></tr></thead>
+            <tbody id="reportsBody">
+              <tr><td colspan="3" class="text-muted" style="padding:20px;text-align:center">No reports yet. Start a symptom check.</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="mt-16">
+          <a href="symptom-chat.html" class="btn-primary" style="font-size:14px;padding:10px 20px;display:inline-block">New Symptom Check →</a>
+        </div>
+      </div>
+
+      <!-- Upcoming Appointments -->
+      <div class="card">
+        <div class="card-title">Upcoming Appointments</div>
+        <div id="upcomingAppts">
+          <p class="text-muted">No upcoming appointments.</p>
+        </div>
+        <div class="mt-16">
+          <a href="doctors.html" class="btn-ghost" style="font-size:14px;padding:10px 20px;display:inline-block">Find a Doctor →</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Medication reminders -->
+    <div class="card mt-24">
+      <div class="card-title">Today's Medication Reminders</div>
+      <div id="medReminders">
+        <p class="text-muted">No medications scheduled. <a href="documents.html" class="text-teal">Upload a prescription</a> to extract reminders.</p>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script src="../js/dashboard.js"></script>
+</body>
+</html>

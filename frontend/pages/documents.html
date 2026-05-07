@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Documents — MediAI</title>
+<link rel="stylesheet" href="../css/main.css">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,300;0,400;0,600;1,300&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+<div class="dashboard-layout">
+  <aside class="sidebar">
+    <div class="sidebar-brand">Medi<span>AI</span></div>
+    <nav class="sidebar-nav">
+      <a href="dashboard.html"><span class="nav-icon">◈</span> Dashboard</a>
+      <a href="symptom-chat.html"><span class="nav-icon">◎</span> Symptom Check</a>
+      <a href="reports.html"><span class="nav-icon">◉</span> My Reports</a>
+      <a href="documents.html" class="active"><span class="nav-icon">⬡</span> Documents</a>
+      <a href="medications.html"><span class="nav-icon">◇</span> Medications</a>
+      <a href="doctors.html"><span class="nav-icon">⊕</span> Find Doctors</a>
+      <a href="appointments.html"><span class="nav-icon">▷</span> Appointments</a>
+    </nav>
+    <div class="sidebar-user">
+      <strong id="sidebarUserName">–</strong>
+      <a href="#" onclick="logout()">Sign out</a>
+    </div>
+  </aside>
+
+  <main class="main-content">
+    <div class="page-header">
+      <h1>Medical Documents</h1>
+      <p>Upload prescriptions, lab reports, and medical images for AI analysis</p>
+    </div>
+
+    <div class="card mb-24">
+      <div class="upload-zone" id="uploadZone" onclick="document.getElementById('fileInput').click()"
+        ondragover="event.preventDefault();this.style.borderColor='var(--teal)'"
+        ondragleave="this.style.borderColor=''"
+        ondrop="handleDrop(event)">
+        <div class="upload-icon">⬡</div>
+        <h3>Upload a medical document</h3>
+        <p>PDF, JPG, PNG — prescriptions, lab reports, X-rays</p>
+        <p class="mt-8" style="font-size:12px;color:var(--ink-muted)">Drag & drop or click to select</p>
+      </div>
+      <input type="file" id="fileInput" style="display:none" accept=".pdf,.jpg,.jpeg,.png"
+        onchange="handleFileSelect(this.files[0])">
+
+      <div id="uploadStatus" class="mt-16" style="display:none">
+        <div class="alert alert-info">
+          ◎ <span id="uploadStatusText">Uploading and analysing document...</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Uploaded Documents</div>
+      <div id="docsList">
+        <p class="text-muted" style="padding:20px 0">No documents uploaded yet.</p>
+      </div>
+    </div>
+
+    <!-- Analysis Result -->
+    <div id="analysisResult" class="card mt-24" style="display:none">
+      <div class="card-title">AI Analysis Result</div>
+      <div id="analysisContent"></div>
+    </div>
+  </main>
+</div>
+
+<script src="../js/documents.js"></script>
+</body>
+</html>
