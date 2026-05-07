@@ -240,24 +240,36 @@ async function loadDocuments() {
 function renderDocuments(docs) {
   const el = document.getElementById('docsList');
   if (!docs.length) {
-    el.innerHTML = '<p class="text-muted">No documents uploaded yet.</p>';
+    el.innerHTML = `
+      <div class="empty-state document-empty">
+        <strong>No documents yet</strong>
+        <span>Upload a prescription, report, or medical image to see its analysis here.</span>
+      </div>`;
     return;
   }
-  el.innerHTML = '<table class="data-table"><thead><tr><th>File</th><th>Type</th><th>Uploaded</th><th></th></tr></thead><tbody>' +
+  el.innerHTML =
     docs.map(d => {
       const hasAnalysis = Boolean(d.ai_analysis);
-      return `<tr>
-        <td>${escHtml(d.original_name)}</td>
-        <td>${escHtml(d.document_type || 'Document')}${hasAnalysis ? '<div class="text-muted">Analyzed</div>' : ''}</td>
-        <td>${new Date(d.uploaded_at).toLocaleDateString()}</td>
-        <td style="white-space:nowrap">
-          <button class="btn-book" style="width:auto;padding:4px 12px" onclick="viewAnalysis(${d.id})">View</button>
-          <button class="btn-book" style="width:auto;padding:4px 12px" onclick="reanalyse(${d.id})">Re-analyze</button>
-          <button class="btn-ghost" style="padding:4px 12px" onclick="deleteDocument(${d.id})">Delete</button>
-        </td>
-      </tr>`;
-    }).join('') +
-  '</tbody></table>';
+      const uploaded = d.uploaded_at ? new Date(d.uploaded_at).toLocaleDateString() : '-';
+      const name = d.original_name || 'Untitled document';
+      const extension = name.includes('.') ? name.split('.').pop().slice(0, 4).toUpperCase() : 'DOC';
+      return `<article class="document-row">
+        <div class="document-file-mark">${escHtml(extension)}</div>
+        <div class="document-row-main">
+          <div class="document-row-title">${escHtml(name)}</div>
+          <div class="document-row-meta">
+            <span>${escHtml(d.document_type || 'Document')}</span>
+            <span>${escHtml(uploaded)}</span>
+            <span class="${hasAnalysis ? 'state-ready' : 'state-pending'}">${hasAnalysis ? 'Analyzed' : 'Needs analysis'}</span>
+          </div>
+        </div>
+        <div class="document-row-actions">
+          <button class="btn-book" onclick="viewAnalysis(${d.id})">View</button>
+          <button class="btn-book" onclick="reanalyse(${d.id})">Re-analyze</button>
+          <button class="btn-ghost" onclick="deleteDocument(${d.id})">Delete</button>
+        </div>
+      </article>`;
+    }).join('');
 }
 
 async function fetchDocument(id) {

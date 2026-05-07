@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Documents — MediAI</title>
+<title>Documents - MediAI</title>
 <link rel="stylesheet" href="../css/main.css">
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,300;0,400;0,600;1,300&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 </head>
@@ -12,56 +12,94 @@
   <aside class="sidebar">
     <div class="sidebar-brand">Medi<span>AI</span></div>
     <nav class="sidebar-nav">
-      <a href="dashboard.html"><span class="nav-icon">◈</span> Dashboard</a>
-      <a href="symptom-chat.html"><span class="nav-icon">◎</span> Symptom Check</a>
-      <a href="reports.html"><span class="nav-icon">◉</span> My Reports</a>
-      <a href="documents.html" class="active"><span class="nav-icon">⬡</span> Documents</a>
-      <a href="medications.html"><span class="nav-icon">◇</span> Medications</a>
-      <a href="doctors.html"><span class="nav-icon">⊕</span> Find Doctors</a>
-      <a href="appointments.html"><span class="nav-icon">▷</span> Appointments</a>
+      <a href="dashboard.html"><span class="nav-icon">01</span> Dashboard</a>
+      <a href="symptom-chat.html"><span class="nav-icon">02</span> Symptom Check</a>
+      <a href="reports.html"><span class="nav-icon">03</span> My Reports</a>
+      <a href="documents.html" class="active"><span class="nav-icon">04</span> Documents</a>
+      <a href="medications.html"><span class="nav-icon">05</span> Medications</a>
+      <a href="doctors.html"><span class="nav-icon">06</span> Find Doctors</a>
+      <a href="appointments.html"><span class="nav-icon">07</span> Appointments</a>
     </nav>
     <div class="sidebar-user">
-      <strong id="sidebarUserName">–</strong>
+      <strong id="sidebarUserName">-</strong>
       <a href="#" onclick="logout()">Sign out</a>
     </div>
   </aside>
 
-  <main class="main-content">
-    <div class="page-header">
-      <h1>Medical Documents</h1>
-      <p>Upload prescriptions, lab reports, and medical images for AI analysis</p>
+  <main class="main-content documents-page">
+    <div class="page-header documents-hero">
+      <div>
+        <span class="eyebrow">Document workspace</span>
+        <h1>Medical Documents</h1>
+        <p>Upload prescriptions, lab reports, and medical images. MediAI reads the text, summarizes the result, and helps turn prescriptions into reminders.</p>
+      </div>
+      <div class="documents-hero-meta" aria-label="Accepted file formats">
+        <span>PDF</span>
+        <span>JPG</span>
+        <span>PNG</span>
+      </div>
     </div>
 
-    <div class="card mb-24">
-      <div class="upload-zone" id="uploadZone" onclick="document.getElementById('fileInput').click()"
-        ondragover="event.preventDefault();this.style.borderColor='var(--teal)'"
-        ondragleave="this.style.borderColor=''"
-        ondrop="handleDrop(event)">
-        <div class="upload-icon">⬡</div>
-        <h3>Upload a medical document</h3>
-        <p>PDF, JPG, PNG — prescriptions, lab reports, X-rays</p>
-        <p class="mt-8" style="font-size:12px;color:var(--ink-muted)">Drag & drop or click to select</p>
-      </div>
-      <input type="file" id="fileInput" style="display:none" accept=".pdf,.jpg,.jpeg,.png"
-        onchange="handleFileSelect(this.files[0])">
+    <div class="documents-shell">
+      <section class="document-upload-panel">
+        <div class="upload-zone modern-upload" id="uploadZone" onclick="document.getElementById('fileInput').click()"
+          ondragover="event.preventDefault();this.classList.add('is-dragging')"
+          ondragleave="this.classList.remove('is-dragging')"
+          ondrop="this.classList.remove('is-dragging');handleDrop(event)">
+          <div class="upload-icon-shell">
+            <span class="upload-icon">+</span>
+          </div>
+          <div class="upload-copy">
+            <h3>Drop your document here</h3>
+            <p>PDFs, prescriptions, lab reports, discharge notes, and clear medical images.</p>
+            <button class="btn-primary upload-action" type="button">Choose file</button>
+          </div>
+        </div>
+        <input type="file" id="fileInput" style="display:none" accept=".pdf,.jpg,.jpeg,.png"
+          onchange="handleFileSelect(this.files[0])">
 
-      <div id="uploadStatus" class="mt-16" style="display:none">
-        <div class="alert alert-info">
-          ◎ <span id="uploadStatusText">Uploading and analysing document...</span>
+        <div id="uploadStatus" class="mt-16" style="display:none">
+          <div class="alert alert-info">
+            <span class="status-dot"></span><span id="uploadStatusText">Uploading and analysing document...</span>
+          </div>
+        </div>
+
+        <div class="document-hints">
+          <div>
+            <strong>Readable PDFs</strong>
+            <span>Best for typed lab reports and summaries.</span>
+          </div>
+          <div>
+            <strong>Clear images</strong>
+            <span>Works best with bright, flat photos.</span>
+          </div>
+          <div>
+            <strong>15MB limit</strong>
+            <span>Accepted formats are PDF, JPG, and PNG.</span>
+          </div>
+        </div>
+      </section>
+
+      <section class="documents-list-panel">
+        <div class="section-heading">
+          <div>
+            <span class="eyebrow">Library</span>
+            <h2>Uploaded Documents</h2>
+          </div>
+        </div>
+        <div id="docsList" class="documents-list">
+          <p class="text-muted empty-state">No documents uploaded yet.</p>
+        </div>
+      </section>
+    </div>
+
+    <div id="analysisResult" class="analysis-panel mt-24" style="display:none">
+      <div class="section-heading">
+        <div>
+          <span class="eyebrow">Review</span>
+          <h2>AI Analysis Result</h2>
         </div>
       </div>
-    </div>
-
-    <div class="card">
-      <div class="card-title">Uploaded Documents</div>
-      <div id="docsList">
-        <p class="text-muted" style="padding:20px 0">No documents uploaded yet.</p>
-      </div>
-    </div>
-
-    <!-- Analysis Result -->
-    <div id="analysisResult" class="card mt-24" style="display:none">
-      <div class="card-title">AI Analysis Result</div>
       <div id="analysisContent"></div>
     </div>
   </main>

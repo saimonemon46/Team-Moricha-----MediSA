@@ -623,6 +623,266 @@ body {
 .upload-zone h3 { font-family: var(--font-display); font-size: 18px; font-weight: 400; margin-bottom: 6px; }
 .upload-zone p { font-size: 13px; color: var(--ink-muted); }
 
+/* ---- DOCUMENTS WORKSPACE ---- */
+.documents-page {
+  background:
+    linear-gradient(180deg, rgba(255,255,255,0.45), rgba(255,255,255,0)),
+    var(--cream);
+}
+.documents-hero {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 24px;
+  margin-bottom: 28px;
+}
+.documents-hero h1 {
+  font-size: clamp(30px, 4vw, 46px);
+  margin: 4px 0 8px;
+}
+.documents-hero p {
+  max-width: 720px;
+  font-size: 15px;
+  line-height: 1.7;
+}
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  color: var(--teal);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.documents-hero-meta {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+.documents-hero-meta span {
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--ink-muted);
+  font-size: 12px;
+  font-weight: 600;
+  padding: 8px 10px;
+  box-shadow: 0 8px 24px rgba(26,23,20,0.05);
+}
+.documents-shell {
+  display: grid;
+  grid-template-columns: minmax(320px, 0.9fr) minmax(420px, 1.1fr);
+  gap: 20px;
+  align-items: start;
+}
+.document-upload-panel,
+.documents-list-panel,
+.analysis-panel {
+  background: rgba(255,255,255,0.86);
+  border: 1px solid rgba(26,23,20,0.1);
+  border-radius: 18px;
+  box-shadow: 0 16px 48px rgba(26,23,20,0.08);
+  padding: 22px;
+}
+.modern-upload {
+  min-height: 280px;
+  display: grid;
+  place-items: center;
+  gap: 18px;
+  padding: 34px 26px;
+  background: linear-gradient(180deg, #ffffff, #f7fbf9);
+  border: 1.5px dashed rgba(13,107,94,0.28);
+  text-align: center;
+}
+.modern-upload:hover,
+.modern-upload.is-dragging {
+  background: #f0faf7;
+  border-color: var(--teal);
+  transform: translateY(-1px);
+}
+.upload-icon-shell {
+  width: 58px;
+  height: 58px;
+  border-radius: 16px;
+  display: grid;
+  place-items: center;
+  background: var(--ink);
+  color: #fff;
+  box-shadow: 0 12px 28px rgba(26,23,20,0.18);
+}
+.modern-upload .upload-icon {
+  font-size: 34px;
+  line-height: 1;
+  margin: 0;
+}
+.upload-copy {
+  max-width: 360px;
+}
+.upload-copy h3 {
+  font-size: 24px;
+  margin-bottom: 8px;
+}
+.upload-copy p {
+  font-size: 14px;
+  line-height: 1.6;
+  margin-bottom: 18px;
+}
+.upload-action {
+  border: none;
+  cursor: pointer;
+  padding: 11px 20px;
+}
+.document-hints {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin-top: 14px;
+}
+.document-hints div {
+  background: rgba(245,240,232,0.7);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 13px;
+}
+.document-hints strong,
+.document-hints span {
+  display: block;
+}
+.document-hints strong {
+  font-size: 13px;
+  margin-bottom: 4px;
+}
+.document-hints span {
+  color: var(--ink-muted);
+  font-size: 12px;
+  line-height: 1.45;
+}
+.section-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+.section-heading h2 {
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 400;
+  margin-top: 2px;
+}
+.documents-list {
+  display: grid;
+  gap: 10px;
+}
+.document-row {
+  display: grid;
+  grid-template-columns: 48px minmax(0, 1fr) auto;
+  gap: 14px;
+  align-items: center;
+  padding: 14px;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: #fff;
+  transition: border-color 0.2s, box-shadow 0.2s, transform 0.15s;
+}
+.document-row:hover {
+  border-color: rgba(13,107,94,0.25);
+  box-shadow: 0 12px 30px rgba(26,23,20,0.08);
+  transform: translateY(-1px);
+}
+.document-file-mark {
+  width: 48px;
+  height: 48px;
+  display: grid;
+  place-items: center;
+  border-radius: 12px;
+  background: var(--teal-light);
+  color: var(--teal);
+  font-size: 11px;
+  font-weight: 700;
+}
+.document-row-title {
+  font-weight: 600;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+}
+.document-row-meta {
+  display: flex;
+  gap: 9px;
+  flex-wrap: wrap;
+  margin-top: 5px;
+  color: var(--ink-muted);
+  font-size: 12px;
+}
+.document-row-meta span {
+  display: inline-flex;
+  align-items: center;
+}
+.document-row-meta span + span::before {
+  content: "";
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: rgba(92,86,78,0.35);
+  margin-right: 9px;
+}
+.state-ready {
+  color: var(--green-safe);
+  font-weight: 600;
+}
+.state-pending {
+  color: var(--amber);
+  font-weight: 600;
+}
+.document-row-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+.document-row-actions .btn-book,
+.document-row-actions .btn-ghost {
+  width: auto;
+  margin: 0;
+  padding: 8px 12px;
+  border-radius: 9px;
+  font-size: 13px;
+  white-space: nowrap;
+}
+.empty-state {
+  padding: 24px;
+  text-align: center;
+}
+.document-empty {
+  border: 1px dashed var(--border);
+  border-radius: 14px;
+  background: rgba(245,240,232,0.48);
+}
+.document-empty strong,
+.document-empty span {
+  display: block;
+}
+.document-empty strong {
+  margin-bottom: 4px;
+  color: var(--ink);
+}
+.document-empty span {
+  color: var(--ink-muted);
+  font-size: 13px;
+}
+.analysis-panel .alert {
+  border-radius: 12px;
+}
+.status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  margin-top: 7px;
+  background: currentColor;
+  box-shadow: 0 0 0 6px rgba(13,107,94,0.12);
+  flex: 0 0 auto;
+}
+
 /* ---- MEDICATION REMINDER ---- */
 .med-pill {
   display: inline-flex;
@@ -736,6 +996,30 @@ body {
   .hero { margin: 48px auto; }
   .sidebar { display: none; }
   .main-content { padding: 20px; }
+  .documents-hero {
+    display: block;
+  }
+  .documents-hero-meta {
+    justify-content: flex-start;
+    margin-top: 16px;
+  }
+  .documents-shell {
+    grid-template-columns: 1fr;
+  }
+  .document-hints {
+    grid-template-columns: 1fr;
+  }
+  .document-row {
+    grid-template-columns: 44px minmax(0, 1fr);
+  }
+  .document-row-actions {
+    grid-column: 1 / -1;
+    flex-wrap: wrap;
+  }
+  .document-row-actions .btn-book,
+  .document-row-actions .btn-ghost {
+    flex: 1 1 110px;
+  }
   .grid-2, .grid-3 { grid-template-columns: 1fr; }
   .steps { flex-direction: column; gap: 24px; }
   .step-arrow { transform: rotate(90deg); }
