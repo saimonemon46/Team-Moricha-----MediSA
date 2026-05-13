@@ -302,11 +302,12 @@ async function startSession(symptomText) {
       window._questions = data.questions;
       window._qIdx = 0;
     } else {
-      addMessage(
-        "I've gathered initial information. Let me analyse your symptoms now.",
-        "ai",
-      );
-      await generateReport();
+      // If medical intent was detected but no questions were generated, ask for more detail
+      // instead of jumping straight to a report which might be empty/undetermined.
+      const msg = data.intent_message || "I need a bit more detail about your symptoms to provide a helpful assessment. Could you describe what you're feeling in more detail?";
+      addMessage(msg, "ai");
+      setStage("initial"); // Allow them to keep typing in initial stage
+      setSendDisabled(false);
     }
   } catch (err) {
     removeTyping();

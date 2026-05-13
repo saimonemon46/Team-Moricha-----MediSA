@@ -1,7 +1,7 @@
 import sys, os
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)) + "/../fastapi_ai")
 
-from workflow import run_question_generation
+from fastapi_ai.workflow import run_question_generation
 
 def test_intent(text):
     print(f"\nTesting: '{text}'")
